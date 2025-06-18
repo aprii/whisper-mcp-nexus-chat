@@ -195,6 +195,19 @@ const ChatInterface = () => {
     };
   }, []);
 
+  // Get user display name from either metadata or email
+  const getUserDisplayName = () => {
+    if (user?.user_metadata?.name) {
+      return user.user_metadata.name;
+    }
+    return user?.email?.split('@')[0] || 'User';
+  };
+
+  const getUserInitial = () => {
+    const name = getUserDisplayName();
+    return name[0]?.toUpperCase() || 'U';
+  };
+
   return (
     <div className="h-screen flex flex-col bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
       {/* Header */}
@@ -252,10 +265,10 @@ const ChatInterface = () => {
             <div className="flex items-center space-x-2">
               <Avatar className="h-8 w-8">
                 <AvatarFallback className="bg-blue-600 text-white">
-                  {user?.name?.[0]?.toUpperCase() || 'U'}
+                  {getUserInitial()}
                 </AvatarFallback>
               </Avatar>
-              <span className="text-white font-medium">{user?.name}</span>
+              <span className="text-white font-medium">{getUserDisplayName()}</span>
               <Button
                 onClick={logout}
                 variant="ghost"

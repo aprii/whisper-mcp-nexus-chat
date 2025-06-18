@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { LogIn, UserPlus, Bot } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const AuthForm = () => {
   const [email, setEmail] = useState('');
@@ -14,14 +15,15 @@ const AuthForm = () => {
   const [name, setName] = useState('');
   const [error, setError] = useState('');
   const { login, signup, isLoading } = useAuth();
+  const { toast } = useToast();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     
-    const success = await login(email, password);
-    if (!success) {
-      setError('Invalid credentials');
+    const { error } = await login(email, password);
+    if (error) {
+      setError(error);
     }
   };
 
@@ -29,9 +31,14 @@ const AuthForm = () => {
     e.preventDefault();
     setError('');
     
-    const success = await signup(email, password, name);
-    if (!success) {
-      setError('Failed to create account');
+    const { error } = await signup(email, password, name);
+    if (error) {
+      setError(error);
+    } else {
+      toast({
+        title: "Account created successfully!",
+        description: "Please check your email to verify your account.",
+      });
     }
   };
 

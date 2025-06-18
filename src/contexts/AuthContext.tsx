@@ -1,16 +1,13 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-
-interface User {
-  id: string;
-  email: string;
-  name: string;
-}
+import { supabase } from '@/integrations/supabase/client';
+import type { User, Session } from '@supabase/supabase-js';
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => Promise<boolean>;
-  signup: (email: string, password: string, name: string) => Promise<boolean>;
+  session: Session | null;
+  login: (email: string, password: string) => Promise<{ error: string | null }>;
+  signup: (email: string, password: string, name: string) => Promise<{ error: string | null }>;
   logout: () => void;
   isLoading: boolean;
 }
@@ -27,72 +24,89 @@ export const useAuth = () => {
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check for existing session
-    const savedUser = localStorage.getItem('user');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
-    setIsLoading(false);
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        console.log('Auth state changed:', event, session);
+        setSession(session);
+        setUser(session?.user ?? null);
+        setIsLoading(false);
+      }
+    );
+
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setIsLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // For demo purposes, accept any email/password
-      const userData = {
-        id: Date.now().toString(),
+      const { error } = await supabase.auth.signInWithPassword({
         email,
-        name: email.split('@')[0],
-      };
-      
-      setUser(userData);
-      localStorage.setItem('user', JSON.stringify(userData));
-      return true;
+        password,
+      });
+
+      if (error) {
+        return { error: error.message };
+      }
+
+      return { error: null };
     } catch (error) {
       console.error('Login error:', error);
-      return false;
+      return { error: 'An unexpected error occurred' };
     } finally {
       setIsLoading(false);
     }
   };
 
-  const signup = async (email: string, password: string, name: string): Promise<boolean> => {
+  const signup = async (email: string, password: string, name: string) => {
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const redirectUrl = `${window.location.origin}/`;
       
-      // For demo purposes, accept any email/password
-      const userData = {
-        id: Date.now().toString(),
+      const { error } = await supabase.auth.signUp({
         email,
-        name,
-      };
-      
-      setUser(userData);
-      localStorage.setItem('user', JSON.stringify(userData));
-      return true;
+        password,
+        options: {
+          emailRedirectTo: redirectUrl,
+          data: {
+            name: name,
+          }
+        }
+      });
+
+      if (error) {
+        return { error: error.message };
+      }
+
+      return { error: null };
     } catch (error) {
       console.error('Signup error:', error);
-      return false;
+      return { error: 'An unexpected error occurred' };
     } finally {
       setIsLoading(false);
     }
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('user');
+  const logout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error('Logout error:', error);
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, signup, logout, isLoading }}>
+    <AuthContext.Provider value={{ user, session, login, signup, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );
