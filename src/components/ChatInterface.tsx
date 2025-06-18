@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -288,7 +287,6 @@ const ChatInterface = () => {
           <div className="space-y-4 max-w-4xl mx-auto">
             {messages.length === 0 && (
               <div className="text-center py-12">
-                <Bot className="h-16 w-16 text-blue-400 mx-auto mb-4" />
                 <h2 className="text-2xl font-semibold text-white mb-2">Welcome to MCP Chat</h2>
                 <p className="text-slate-300">Connect to your MCP server and start chatting!</p>
               </div>
