@@ -50,7 +50,6 @@ export const ConnectionSettingsDialog: React.FC<ConnectionSettingsDialogProps> =
   const handleConnect = () => {
     onSettingsChange(localSettings);
     onConnect();
-    setOpen(false);
   };
 
   return (
