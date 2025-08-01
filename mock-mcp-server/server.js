@@ -6,8 +6,11 @@ const app = express();
 const port = 3001;
 
 // Middleware
-app.use(cors());
+app.use(cors()); 
 app.use(express.json()); // To parse JSON bodies
+
+// Explicitly handle preflight requests
+app.options('*', cors()); // Enable pre-flight for all routes
 
 // In-memory store for connected clients
 let clients = [];
@@ -30,7 +33,7 @@ app.get('/sse', (req, res) => {
     res,
   };
   clients.push(newClient);
-  console.log(`Client ${clientId} connected to SSE endpoint`);
+  console.log(`Client ${clientId} connected to SSE endpoint from origin: ${req.headers.origin}`);
 
   // Send a welcome message
   sendSse(res, { type: 'message', content: 'Welcome to the Mock MCP SSE Server!' });
@@ -64,4 +67,3 @@ app.post('/message', (req, res) => {
 app.listen(port, () => {
   console.log(`Mock MCP SSE server started on http://localhost:${port}`);
 });
-
