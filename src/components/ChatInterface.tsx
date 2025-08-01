@@ -5,12 +5,12 @@ import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { ConnectionSettingsDialog } from './ConnectionSettingsDialog';
 import { 
   Send, 
   LogOut, 
   Bot, 
   User, 
-  Settings, 
   Wifi, 
   WifiOff,
   Loader2
@@ -231,52 +231,29 @@ const ChatInterface = () => {
             </div>
           </div>
           
-          <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
-            <div className="flex items-center space-x-2 w-full md:w-auto">
-              <Input
-                placeholder="MCP Server URL"
-                value={serverUrl}
-                onChange={(e) => setServerUrl(e.target.value)}
-                className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-400 w-full md:w-64"
-              />
-              {mcpConnection.isConnected ? (
-                <Button
-                  onClick={disconnectFromMCP}
-                  variant="outline"
-                  size="sm"
-                  className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
-                >
-                  Disconnect
-                </Button>
-              ) : (
-                <Button
-                  onClick={connectToMCP}
-                  variant="outline"
-                  size="sm"
-                  className="border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white"
-                  disabled={mcpConnection.status === 'connecting'}
-                >
-                  {mcpConnection.status === 'connecting' ? 'Connecting...' : 'Connect'}
-                </Button>
-              )}
-            </div>
-            
-            <div className="flex items-center space-x-2 self-end md:self-center">
-              <Avatar className="h-8 w-8">
-                <AvatarFallback className="bg-blue-600 text-white">
-                  {getUserInitial()}
-                </AvatarFallback>
-              </Avatar>
-              <span className="text-white font-medium">{getUserDisplayName()}</span>
-              <Button
-                onClick={logout}
-                variant="ghost"
-                size="sm"
-                className="text-slate-300 hover:text-white hover:bg-slate-700"
-              >
-                <LogOut className="h-4 w-4" />
-              </Button>
-            </div>
+          <div className="flex items-center space-x-2 self-end md:self-center">
+            <ConnectionSettingsDialog
+              settings={{ serverUrl }}
+              onSettingsChange={(settings) => setServerUrl(settings.serverUrl)}
+              isConnected={mcpConnection.isConnected}
+              onConnect={connectToMCP}
+              onDisconnect={disconnectFromMCP}
+              connectionStatus={mcpConnection.status}
+            />
+            <Avatar className="h-8 w-8">
+              <AvatarFallback className="bg-blue-600 text-white">
+                {getUserInitial()}
+              </AvatarFallback>
+            </Avatar>
+            <span className="text-white font-medium">{getUserDisplayName()}</span>
+            <Button
+              onClick={logout}
+              variant="ghost"
+              size="sm"
+              className="text-slate-300 hover:text-white hover:bg-slate-700"
+            >
+              <LogOut className="h-4 w-4" />
+            </Button>
           </div>
         </div>
       </div>
