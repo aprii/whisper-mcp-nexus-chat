@@ -211,8 +211,8 @@ const ChatInterface = () => {
     <div className="h-screen flex flex-col bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
       {/* Header */}
       <div className="bg-slate-800/80 backdrop-blur-sm border-b border-slate-700 p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center space-x-3 self-start md:self-center">
             <Bot className="h-8 w-8 text-blue-400" />
             <div>
               <h1 className="text-xl font-bold text-white">MCP Chat</h1>
@@ -223,7 +223,7 @@ const ChatInterface = () => {
                   <WifiOff className="h-4 w-4 text-red-400" />
                 )}
                 <span className="text-slate-300">
-                  {mcpConnection.status === 'connected' ? 'Connected' : 
+                  {mcpConnection.status === 'connected' ? 'Connected' :
                    mcpConnection.status === 'connecting' ? 'Connecting...' :
                    mcpConnection.status === 'error' ? 'Connection Error' : 'Disconnected'}
                 </span>
@@ -231,13 +231,13 @@ const ChatInterface = () => {
             </div>
           </div>
           
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
+          <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
+            <div className="flex items-center space-x-2 w-full md:w-auto">
               <Input
                 placeholder="MCP Server URL"
                 value={serverUrl}
                 onChange={(e) => setServerUrl(e.target.value)}
-                className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-400 w-64"
+                className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-400 w-full md:w-64"
               />
               {mcpConnection.isConnected ? (
                 <Button
@@ -261,7 +261,7 @@ const ChatInterface = () => {
               )}
             </div>
             
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 self-end md:self-center">
               <Avatar className="h-8 w-8">
                 <AvatarFallback className="bg-blue-600 text-white">
                   {getUserInitial()}
